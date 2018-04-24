@@ -6,7 +6,7 @@ import confidenceInterval
 class TestInterval(unittest.TestCase):
     def test_confInt(self):
         result=confidenceInterval.confInt(25,150,.95)
-        expResult=(0.10705, 0.22635)
+        expResult=(0.10703, 0.22631)
         self.assertEqual(expResult,result)
     
     
