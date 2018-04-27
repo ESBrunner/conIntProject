@@ -22,11 +22,12 @@ def statsProject(sigLevel):
 #establish some variables.
     lineCount=0
     under20Count=0
+    n=500
     #Some of my birthdates are approximate. I need to keep track of how many of these are close enough to
     #20 years before the death date to complicate my analysis. 
     possibleProblemCount=0
 #make a set of random numbers between 1 and 17049, which is the number of names in the database. 
-    randSet=randNums(17050)
+    randSet=randNums(17049)
 #read in dataset. I converted it to an excel file, and I can convert that to csd.
 #what I need to do here: extract birthdate. Deal with birthdates in the format c. 1865. (I think I can
 # just convert them to 01/01/1865.) Extract death date.
@@ -38,14 +39,20 @@ def statsProject(sigLevel):
         for row in reader:
             if lineCount in randSet:
                 print(row['name'], row['birthdate'], row['deathdate'])
-                results=dateConvert.is20(row['birthdate'],row['deathdate'])
-                if results[0]==True:
-                    under20Count+=1
-                if results[1]==True:
-                    possibleProblemCount+=1
-                    print('Problem!')
+                #I'm getting a few errors because of improperly-formatted data.
+                #For now, I'm going to throw an exception that excludes them from teh results.
+    
+                try:
+                    results=dateConvert.is20(row['birthdate'],row['deathdate'])
+                    if results[0]==True:
+                        under20Count+=1
+                    if results[1]==True:
+                        possibleProblemCount+=1
+                        print('Problem!')
+                except (ValueError, KeyError, IndexError):
+                    n-=1
             lineCount+=1
-    conf=confidenceInterval.confInt(under20Count, 500,sig)
+    conf=confidenceInterval.confInt(under20Count, n,sig)
     print(under20Count)
     percent=str(int(sig*100))
     return("The " + percent +"% confidence interval is (" + str(conf[0])+"," + str(conf[1]) + "), and the number of possible problem results is " + str(possibleProblemCount) +'.')
